@@ -2,7 +2,6 @@ from bs4 import BeautifulSoup
 import csv
 import requests
 import re
-import websocket
 from flask import Flask,request,render_template
 import json
 
