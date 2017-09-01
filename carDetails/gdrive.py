@@ -105,18 +105,12 @@ def createNewFolder(service, name,parent):
     """
     folderID = getIDfromName(service=service, name=name)
     if folderID is not None:
-        return folderID
-    if(parent != None):
-        folder_metadata = {
-            'name': name,
-            'mimeType': 'application/vnd.google-apps.folder',
-        }
-    else:
-        folder_metadata = {
-            'name': name,
-            'mimeType': 'application/vnd.google-apps.folder',
-            'parents': [parent]
-        }
+        return [folderID,0]
+    folder_metadata = {
+        'name': name,
+        'mimeType': 'application/vnd.google-apps.folder',
+        'parents': [parent]
+    }
 
 
 
@@ -125,7 +119,7 @@ def createNewFolder(service, name,parent):
     print('Folder Creation Complete')
     print('Folder Name: %s' % folder.get('name'))
     print('Folder ID: %s \n' % folder.get('id'))
-    return folderID
+    return [folderID]
 
 def getTimestampLabel():
 	"""Creates and returns a legible timestamp string; 

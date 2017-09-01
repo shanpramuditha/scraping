@@ -12,7 +12,7 @@ from oauth2client import client
 from oauth2client import tools
 from oauth2client.file import Storage
 from oauth2client.service_account import ServiceAccountCredentials
-from gdrive import get_service,uploadFileToFolder,getIDfromName,shareFileWithEmail
+from gdrive import get_service,uploadFileToFolder,getIDfromName,shareFileWithEmail,createNewFolder
 from sqlite import setup,insertImage,isImageAvailable
 import cssutils
 import urllib
@@ -20,7 +20,7 @@ import urllib
 
 
 baseLink = 'https://www.goauto.com.au'
-baseFolder = ''
+baseFolder = 'e'
 def scrape(next_page_url):
     headers = {'User-Agent': 'Mozilla/5.0'}
     response = requests.get(next_page_url, headers=headers)
@@ -52,7 +52,7 @@ def scrapeCarReviews():
         results.extend(temp[0])
         nextLink = temp[1]
     for result in results:
-        print extractImage(baseLink+result['href'])
+        saveImage(extractImage(baseLink+result['href']))
 
 def scrapeCarNew():
     url = 'https://www.goauto.com.au/new-models.html'
@@ -192,24 +192,34 @@ def extractImage(link):
     # print image
     # exit(0)
     # print baseLink+image
-    return [baseLink+image,link.split('/')[3:5]]
+    return [baseLink+image,link.split('/')[3:]]
 
 def saveImage(result):
     folder = ""
     image = result[0]
     category = result[1][0]
-    type = result[1][2]
-    fileName = result[1][3]+'-'+result[1][4]+'-'+result[1][5]+'.jpg'
+    type = result[1][1]
+    fileName = result[1][0]+'-'+result[1][1]+'-'+result[1][2]+'.jpg'
     if(isImageAvailable(image)):
         return 0
     else:
         insertImage(image,fileName)
+        MainFolderId = createNewFolder(service,category+"s",baseFolder)
+        print MainFolderId
+        subFolderId = createNewFolder(service,type+"s",MainFolderId)
+        print subFolderId
+        downloadImage(image,fileName)
+        if (len(MainFolderId) == 1):
+            shareFileWithEmail(service, MainFolderId, 'mkspramuditha@gmail.com')
+        if (len(subFolderId) == 1):
+            shareFileWithEmail(service, subFolderId, 'mkspramuditha@gmail.com')
+        MainFolderId = MainFolderId[0]
+        subFolderId = subFolderId[0]
+        fileId = uploadFileToFolder(service,subFolderId,fileName)
+
 
 
     # uploadFileToFolder(service=service, folderID=folder, fileName=fileName)
-
-def setBaseFolder():
-    name = 'images'
 
 def downloadImage(imageLink,imageName):
     urllib.urlretrieve(imageLink,'images/'+imageName)
@@ -219,8 +229,12 @@ def downloadImage(imageLink,imageName):
 # image = extractImage("https://www.goauto.com.au/car-reviews/mercedes-benz/glc-coupe/250d/2017-03-23/27146.html")
 service = get_service()
 # uploadFileToFolder(service=service, folderID='0B7Kfv7Ef2210SDZaR3lDZWFLRkE', fileName='image.jpg')
-# scrapeCarReviews()
+scrapeCarReviews()
 # print extractImage('https://www.goauto.com.au/car-reviews/mercedes-benz/glc-coupe/250d/2017-03-23/27146.html')
-image = 'testing.jpg'
-downloadImage('https://www.goauto.com.au/assets/contents/925b256b5dea3626ae7f0471dade0a166c54e33f.jpg',image)
-uploadFileToFolder(service,'0B_0E4HVtROqicmV5bWVXektQcDg',image)
+# image = 'testing.jpg'
+# downloadImage('https://www.goauto.com.au/assets/contents/925b256b5dea3626ae7f0471dade0a166c54e33f.jpg',image)
+# MainFolderId = createNewFolder(service,'tresdsde',baseFolder)
+# uploadFileToFolder(service,MainFolderId[0],image)
+# shareFileWithEmail(service,MainFolderId[0],'mkspramuditha@gmail.com')
+# folder = createNewFolder(service,"sdsd",baseFolder)
+# shareFileWithEmail(service,MainFolderId,"mkspramuditha@gmail.com")
