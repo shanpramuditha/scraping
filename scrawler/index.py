@@ -61,7 +61,6 @@ def getFileCount():
     return res
 
 @app.route('/scrawl/<version>/<link>',methods=['GET','POST'])
-@crossdomain(origin='*')
 def response(version,link):
     # return version+'://'+link
     list = scrawl(version+'://'+link,100)
