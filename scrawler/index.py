@@ -4,10 +4,10 @@ import requests
 import re
 import websocket
 from flask import Flask,request,render_template
-
 import json
 
 app = Flask(__name__)
+
 @app.route('/', methods=['GET','POST'])
 def index():
     return render_template('index.html')
@@ -63,11 +63,8 @@ def getFileCount():
 @app.route('/scrawl/<version>/<link>',methods=['GET','POST'])
 def response(version,link):
     # return version+'://'+link
-    list = scrawl(version+'://'+link,100)
-    response = Flask.jsonify(list)
-    response.headers.add('Access-Control-Allow-Origin', '*')
-    return response
-    # return json.dumps(list)
+    list = scrawl(version+'://'+link,500)
+    return json.dumps(list)
     # print "sd"
     # return "ssd"
 
